@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黄金分割率计算器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+        }
+        input {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .result div {
+            width: 45%;
+            margin: 5px 0;
+        }
+        .result p {
+            font-weight: bold;
+            margin: 5px 0;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        #chart {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>黄金分割率计算器</h1>
+        <input type="number" id="maxValue" placeholder="最高值">
+        <input type="number" id="minValue" placeholder="最低值">
+        <button onclick="calculate()">计算</button>
+        <div class="result" id="result"></div>
+        <canvas id="chart" width="400" height="200"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function calculate() {
+            const maxValue = parseFloat(document.getElementById('maxValue').value);
+            const minValue = parseFloat(document.getElementById('minValue').value);
+            if (isNaN(maxValue) || isNaN(minValue)) {
+                alert('请输入有效的数字');
+                return;
+            }
+
+            const difference = maxValue - minValue;
+            const result386 = difference * 0.386 + minValue;
+            const result50 = difference * 0.5 + minValue;
+            const result618 = difference * 0.618 + minValue;
+            const resultDifference = difference.toFixed(2);
+
+            document.getElementById('result').innerHTML = `
+                <div>
+                    <p onclick="copyToClipboard('${resultDifference}')">差值: ${resultDifference}</p>
+                </div>
+                <div>
+                    <p onclick="copyToClipboard('${result386.toFixed(2)}')">0.386: ${result386.toFixed(2)}</p>
+                    <p>与最高值相差: ${(maxValue - result386).toFixed(2)}</p>
+                </div>
+                <div>
+                    <p onclick="copyToClipboard('${result50.toFixed(2)}')">0.5: ${result50.toFixed(2)}</p>
+                    <p>与最高值相差: ${(maxValue - result50).toFixed(2)}</p>
+                </div>
+                <div>
+                    <p onclick="copyToClipboard('${result618.toFixed(2)}')">0.618: ${result618.toFixed(2)}</p>
+                    <p>与最高值相差: ${(maxValue - result618).toFixed(2)}</p>
+                </div>
+            `;
+
+            drawChart(minValue, result386, result50, result618, maxValue);
+        }
+
+        function drawChart(min, val386, val50, val618, max) {
+            const ctx = document.getElementById('chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['最低值', '0.386', '0.5', '0.618', '最高值'],
+                    datasets: [{
+                        label: '值',
+                        data: [min, val386, val50, val618, max],
+                        borderColor: 'rgba(0, 123, 255, 1)',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '比例'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '值'
+                            },
+                            min: min,
+                            max: max
+                        }
+                    }
+                }
+            });
+        }
+
+        function copyToClipboard(value) {
+            const tempInput = document.createElement('input');
+            tempInput.style.position = 'absolute';
+            tempInput.style.left = '-9999px';
+            tempInput.value = value;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert('已复制: ' + value);
+        }
+    </script>
+</body>
+</html>
